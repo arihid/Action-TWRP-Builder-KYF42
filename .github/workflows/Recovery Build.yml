@@ -127,7 +127,7 @@ jobs:
     - name: Checkout Kernel Source
       uses: actions/checkout@v4
       with:
-        repository: arihid95/android_kernel_kyocera_sd215
+        repository: arihid/android_kernel_kyocera_sd215
         ref: main
         path: kernel/kyocera/sd215
         
