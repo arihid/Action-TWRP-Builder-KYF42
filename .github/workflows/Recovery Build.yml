@@ -126,7 +126,7 @@ jobs:
       
     - name: Clone Kernel Source
       run: |
-        git clone https://github.com/arihid/android_kernel_kyocera_sd215 -b ${{ github.workspace }}/kernel/kyocera/sd215
+        git clone -b main https://github.com/arihid/android_kernel_kyocera_sd215 ${{ github.workspace }}/kernel/kyocera/sd215
 
     - name: Clone common tree
       if: |
