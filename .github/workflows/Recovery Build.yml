@@ -131,20 +131,24 @@ jobs:
         ref: main
         path: ${{ github.workspace }}/workspace/kernel/kyocera/sd215
     
-    - name: Force Overwrite Broken Host Toolchain
+    - name: Force Overwrite Broken Host Toolchain via Wrapper Scripts
       run: |
-        # 1. Remap the exact target folder paths
+        # 1. Remap the target folder paths
         HOST_GCC_DIR="${{ github.workspace }}/workspace/prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.17-4.8/bin"
         KERNEL_SCRIPT_DIR="${{ github.workspace }}/workspace/kernel/kyocera/sd215/scripts"
         
         # 2. Fix the persistent script permission problem by targeting the exact file
         chmod 755 $KERNEL_SCRIPT_DIR/clang-android.sh || true
         
-        # 3. Physically copy the working system compilers over the broken prebuilt binaries
-        cp -f /usr/bin/gcc $HOST_GCC_DIR/x86_64-linux-gcc
-        cp -f /usr/bin/g++ $HOST_GCC_DIR/x86_64-linux-g++
+        # 3. Write a tiny bash wrapper script over x86_64-linux-gcc
+        echo '#!/bin/bash' > $HOST_GCC_DIR/x86_64-linux-gcc
+        echo 'exec /usr/bin/gcc "$@"' >> $HOST_GCC_DIR/x86_64-linux-gcc
         
-        # 4. Verify the executable bits are flipped on
+        # 4. Write a tiny bash wrapper script over x86_64-linux-g++
+        echo '#!/bin/bash' > $HOST_GCC_DIR/x86_64-linux-g++
+        echo 'exec /usr/bin/g++ "$@"' >> $HOST_GCC_DIR/x86_64-linux-g++
+        
+        # 5. Make both wrapper scripts executable
         chmod +x $HOST_GCC_DIR/x86_64-linux-gcc
         chmod +x $HOST_GCC_DIR/x86_64-linux-g++
         
