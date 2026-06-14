@@ -140,12 +140,14 @@ jobs:
         # 2. Fix the persistent script permission problem by targeting the exact file
         chmod 755 $KERNEL_SCRIPT_DIR/clang-android.sh || true
         
-        # 3. Write a tiny bash wrapper script over x86_64-linux-gcc
+        # 3. Write an advanced bash wrapper script over x86_64-linux-gcc that forces /usr/bin into the PATH lookup
         echo '#!/bin/bash' > $HOST_GCC_DIR/x86_64-linux-gcc
+        echo 'export PATH="/usr/bin:$PATH"' >> $HOST_GCC_DIR/x86_64-linux-gcc
         echo 'exec /usr/bin/gcc "$@"' >> $HOST_GCC_DIR/x86_64-linux-gcc
         
-        # 4. Write a tiny bash wrapper script over x86_64-linux-g++
+        # 4. Write an advanced bash wrapper script over x86_64-linux-g++
         echo '#!/bin/bash' > $HOST_GCC_DIR/x86_64-linux-g++
+        echo 'export PATH="/usr/bin:$PATH"' >> $HOST_GCC_DIR/x86_64-linux-g++
         echo 'exec /usr/bin/g++ "$@"' >> $HOST_GCC_DIR/x86_64-linux-g++
         
         # 5. Make both wrapper scripts executable
