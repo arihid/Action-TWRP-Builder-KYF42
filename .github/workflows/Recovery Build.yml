@@ -131,14 +131,22 @@ jobs:
         ref: main
         path: ${{ github.workspace }}/workspace/kernel/kyocera/sd215
     
-    - name: Fix Kernel Script Permissions and Host Compilers
+    - name: Hijack Broken Host Toolchain
       run: |
-        # 1. Restore executable permissions to all kernel script directories
-        chmod -R +x ${{ github.workspace }}/workspace/kernel/kyocera/sd215/scripts/
+        # Define the directory where the broken host compiler lives
+        HOST_GCC_DIR="${{ github.workspace }}/workspace/prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.17-4.8/bin"
         
-        # 2. Force the build system to use the runner's native host tools to bypass the __libc linker error
-        echo "HOSTCC=gcc" >> $GITHUB_ENV
-        echo "HOSTCXX=g++" >> $GITHUB_ENV
+        # Remove the broken prebuilt binaries
+        rm -f $HOST_GCC_DIR/x86_64-linux-gcc
+        rm -f $HOST_GCC_DIR/x86_64-linux-g++
+        
+        # Create symlinks pointing to the runner's native modern gcc/g++ compilers
+        ln -s /usr/bin/gcc $HOST_GCC_DIR/x86_64-linux-gcc
+        ln -s /usr/bin/g++ $HOST_GCC_DIR/x86_64-linux-g++
+        
+        # Make sure permissions are correct
+        chmod +x $HOST_GCC_DIR/x86_64-linux-gcc
+        chmod +x $HOST_GCC_DIR/x86_64-linux-g++
         
     - name: Clone common tree
       if: |
