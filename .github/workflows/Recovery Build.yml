@@ -131,22 +131,17 @@ jobs:
         ref: main
         path: ${{ github.workspace }}/workspace/kernel/kyocera/sd215
     
-    - name: Hijack Broken Host Toolchain
+    - name: Bypass Broken Host Toolchain via PATH
       run: |
-        # Define the directory where the broken host compiler lives
-        HOST_GCC_DIR="${{ github.workspace }}/workspace/prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.17-4.8/bin"
+        # 1. Create a custom directory outside the restricted workspace
+        mkdir -p ${{ github.workspace }}/spoof_bin
         
-        # Remove the broken prebuilt binaries
-        rm -f $HOST_GCC_DIR/x86_64-linux-gcc
-        rm -f $HOST_GCC_DIR/x86_64-linux-g++
+        # 2. Create symlinks pointing to the runner's native modern gcc/g++ compilers
+        ln -s /usr/bin/gcc ${{ github.workspace }}/spoof_bin/x86_64-linux-gcc
+        ln -s /usr/bin/g++ ${{ github.workspace }}/spoof_bin/x86_64-linux-g++
         
-        # Create symlinks pointing to the runner's native modern gcc/g++ compilers
-        ln -s /usr/bin/gcc $HOST_GCC_DIR/x86_64-linux-gcc
-        ln -s /usr/bin/g++ $HOST_GCC_DIR/x86_64-linux-g++
-        
-        # Make sure permissions are correct
-        chmod +x $HOST_GCC_DIR/x86_64-linux-gcc
-        chmod +x $HOST_GCC_DIR/x86_64-linux-g++
+        # 3. Inject our spoof directory to the absolute front of the system PATH
+        echo "${{ github.workspace }}/spoof_bin" >> $GITHUB_PATH
         
     - name: Clone common tree
       if: |
