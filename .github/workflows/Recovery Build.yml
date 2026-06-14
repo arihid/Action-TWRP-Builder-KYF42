@@ -129,7 +129,7 @@ jobs:
       with:
         repository: arihid/android_kernel_kyocera_sd215
         ref: main
-        path: kernel/kyocera/sd215
+        path: ${{ github.workspace }}/workspace/kernel/kyocera/sd215
         
     - name: Clone common tree
       if: |
